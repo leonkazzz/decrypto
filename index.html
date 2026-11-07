@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b101c">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="线下 Decrypto 类猜词游戏主持人工具：红蓝队各4个密词、3700+中文词库、单张重抽与修改、开局锁定、三位密码生成、比分与回合记录，数据只保存在本机浏览器。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="密语控制台">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b101c'/%3E%3Crect x='10' y='14' width='20' height='36' rx='5' fill='%23ef575e'/%3E%3Crect x='34' y='14' width='20' height='36' rx='5' fill='%2353a6ff'/%3E%3C/svg%3E">
+<title>密语控制台 · 红蓝线下主持人版</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="shell">
+<header class="topbar"><div><div class="brand"><i></i> CIPHER DESK · PARTY EDITION</div><h1>密语控制台 <span class="title-accent">· 红蓝版</span></h1><p class="sub">红蓝两队，各四个秘密词。准备阶段任意重抽或编辑；开局后锁定词卡，每轮只更新密码。</p></div><div class="rightmark">◎ 无需登录 · 仅本地保存</div></header>
+<div class="stats" aria-live="polite"><div class="stat">内置密词 <strong id="totalCount">—</strong></div><div class="stat">自定义 <strong id="customCount">0</strong></div><div class="stat">进度 <strong id="gameRound">尚未开始</strong></div></div>
+<noscript><p class="warning">本工具需要启用 JavaScript。</p></noscript>
+<div class="layout">
+<div class="main-col">
+<section id="teamPanel" class="panel team-red" aria-label="队伍密词和密码"><div class="tabs" role="group" aria-label="查看队伍"><button id="tabRed" class="tab active-red" type="button">● 红队 · RED</button><button id="tabBlue" class="tab" type="button">● 蓝队 · BLUE</button></div><div class="panel-inner"><div class="team-header"><div class="team-headline"><span class="orb"></span><span id="teamName">红队</span></div><span id="phasePill" class="pill">准备阶段</span></div>
+<div class="panel-heading"><div><h2>四张秘密词卡</h2><div class="tiny" id="teamPrivateNotice">只向红队展示这4个词</div></div><button class="btn btn-small" id="wordRevealBtn" type="button">查看本队密词</button></div>
+<div id="wordGrid" class="words"></div><p id="wordActionsHelp" class="tiny" aria-live="polite">准备阶段：可以单张重抽，也可以直接手动修改。</p>
+<hr class="divider"><div class="panel-heading"><div><h2>本轮加密密码</h2><div class="tiny">只有本队加密员应该看到</div></div><button id="codeBtn" class="btn btn-small" type="button">查看密码</button></div>
+<div class="code-box"><div id="codeCaption" class="code-caption">正式开始后生成第1轮密码</div><div id="codeDigits" class="code-digits" aria-live="polite"><div class="digit hidden">?</div><div class="digit hidden">?</div><div class="digit hidden">?</div></div></div><p id="codeHelp" class="tiny">第一轮双方只解密，不进行拦截。</p>
+<div class="lock-overlay"><div class="buttons"><button class="btn btn-primary btn-wide" id="startBtn" type="button">🔒 确认8个密词 · 正式开始</button><button class="btn btn-primary btn-wide" id="nextBtn" type="button" hidden>→ 下一轮 · 生成新密码</button></div><p id="progressHint" class="tiny" style="margin-bottom:0">确认双方四个词后，再正式开始。</p></div>
+</div></section>
+<section id="scorePanel" class="panel score-panel" aria-label="比分与回合记录"><div class="panel-inner">
+<div class="panel-heading"><div><h2>比分与回合记录</h2><div class="tiny">公开信息：所有人都可以看</div></div></div>
+<div id="winBanner" class="win-banner" hidden role="status"></div>
+<div class="scoreboard">
+<div class="score-team score-red"><div class="score-title">红队</div>
+<div class="score-row"><span>拦截成功</span><div class="stepper"><button type="button" class="btn btn-small" data-score="red.intercept.-1" aria-label="红队拦截成功减一">−</button><strong id="score-red-intercept">0</strong><button type="button" class="btn btn-small" data-score="red.intercept.1" aria-label="红队拦截成功加一">＋</button></div></div>
+<div class="score-row"><span>传达失误</span><div class="stepper"><button type="button" class="btn btn-small" data-score="red.miss.-1" aria-label="红队传达失误减一">−</button><strong id="score-red-miss">0</strong><button type="button" class="btn btn-small" data-score="red.miss.1" aria-label="红队传达失误加一">＋</button></div></div>
+</div>
+<div class="score-team score-blue"><div class="score-title">蓝队</div>
+<div class="score-row"><span>拦截成功</span><div class="stepper"><button type="button" class="btn btn-small" data-score="blue.intercept.-1" aria-label="蓝队拦截成功减一">−</button><strong id="score-blue-intercept">0</strong><button type="button" class="btn btn-small" data-score="blue.intercept.1" aria-label="蓝队拦截成功加一">＋</button></div></div>
+<div class="score-row"><span>传达失误</span><div class="stepper"><button type="button" class="btn btn-small" data-score="blue.miss.-1" aria-label="蓝队传达失误减一">−</button><strong id="score-blue-miss">0</strong><button type="button" class="btn btn-small" data-score="blue.miss.1" aria-label="蓝队传达失误加一">＋</button></div></div>
+</div>
+</div>
+<p class="tiny">规则提示：先拿到 2 次「拦截成功」的队伍获胜；先累计 2 次「传达失误」的队伍落败。</p>
+<details class="history"><summary>已公布的往轮密码</summary><div id="historyList" class="history-list"></div></details>
+</div></section>
+</div>
+<aside class="panel" aria-label="主持人设置"><div class="side-body"><h2>主持人工作台</h2><p class="muted" style="margin-top:5px">每个人在自己的浏览器里独立开局，不会互相影响。</p>
+<div class="setting"><label class="label" for="mode">抽词模式</label><select id="mode" class="field"><option value="builtin">仅内置词库</option><option value="custom">仅自定义词库</option><option value="mixed">内置 + 自定义混合</option></select><p id="modeHint" class="mode-help">只从内置词库中抽取。</p></div>
+<div class="setting"><button id="newGameBtn" type="button" class="btn btn-wide">↻ 准备新一局 · 重新抽8词</button></div>
+<hr class="divider"><h3>自定义词库</h3><p class="tiny">支持手动添加、批量粘贴、从 .txt/.csv 文件导入和逐个删除。用空格、逗号、顿号或换行分隔，每个词最多18个字符。添加后永久保留在这个浏览器里。</p>
+<label class="sr-only" for="customInput">添加自定义词</label><textarea id="customInput" class="field" placeholder="例：小龙虾，毕业旅行，熊猫，期末考试" rows="3"></textarea><div class="buttons" style="margin-top:9px"><button class="btn btn-primary" type="button" id="customAddBtn">＋ 添加到词库</button><label class="btn" for="customFileInput">从文件导入</label><input id="customFileInput" type="file" accept=".txt,.csv,text/plain,text/csv" hidden></div>
+<p id="customListCaption" class="tiny" style="margin-top:15px">已保存 0 个自定义词</p><div id="customTags" class="list-editor" aria-live="polite"></div>
+<div class="buttons" style="margin-top:10px"><button class="btn btn-small" type="button" id="wordDownloadBtn">导出自定义词</button><button class="btn btn-small btn-ghost" type="button" id="customClearBtn">清空自定义词库</button></div>
+<hr class="divider"><h3>换设备（手动备份）</h3><p class="tiny">无需账号，不自动云同步。但你可以导出主持人存档，换设备后手动导入，接着玩原来那一轮。</p><div class="buttons"><button type="button" id="backupBtn" class="btn btn-small">↓ 导出存档</button><label class="btn btn-small" for="restoreInput">↑ 导入存档</label><input id="restoreInput" type="file" accept=".json,application/json" hidden></div>
+<p class="warning">⚠ 存档含两队秘密词和密码，请只由主持人保管。</p><div class="note">这个网页不需要账号或数据库，每位访客的数据只保存在自己的浏览器里。不同设备不会自动同步；清理缓存或使用隐私模式可能让存档消失，重要对局请导出存档。</div>
+</div></aside>
+</div><div class="footer">独立非官方线下主持工具 · 玩法参考 Decrypto · 不上传密词或密码</div>
+</main><div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+<script src="words.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
